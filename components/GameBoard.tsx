@@ -21,8 +21,53 @@ export default function GameBoard() {
     // Leaderboard state
     const [leaderboard, setLeaderboard] = useState<{ name: string; score: number }[]>([]);
 
-    // We use a ref to keep track of the channel so we can broadcast events
     const channelRef = useRef<any>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [isMuted, setIsMuted] = useState(false);
+
+    // Audio setup — create once on mount, clean up on unmount
+    useEffect(() => {
+        const audio = new Audio("/music/funky-guitar.mp3");
+        audio.loop = true;
+        audio.volume = 1;
+        audioRef.current = audio;
+        return () => {
+            audio.pause();
+            audio.src = "";
+        };
+    }, []);
+
+    // Control music based on game phase
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        if (gameState === "playing") {
+            audio.currentTime = 0;
+            audio.volume = 1;
+            audio.play().catch(() => {});
+        } else if (gameState === "finished") {
+            const steps = 30;
+            const stepMs = 100; // 30 steps × 100ms = 3s fade
+            const decrement = audio.volume / steps;
+            const fade = setInterval(() => {
+                if (audio.volume > decrement) {
+                    audio.volume = Math.max(0, audio.volume - decrement);
+                } else {
+                    audio.volume = 0;
+                    audio.pause();
+                    audio.currentTime = 0;
+                    clearInterval(fade);
+                }
+            }, stepMs);
+            return () => clearInterval(fade);
+        } else {
+            // back_to_lobby — stop immediately
+            audio.pause();
+            audio.currentTime = 0;
+            audio.volume = 1;
+        }
+    }, [gameState]);
 
     // Setup Supabase Realtime channel
     useEffect(() => {
@@ -119,6 +164,13 @@ export default function GameBoard() {
         });
     };
 
+    const toggleMute = () => {
+        if (audioRef.current) {
+            audioRef.current.muted = !audioRef.current.muted;
+            setIsMuted(audioRef.current.muted);
+        }
+    };
+
     // --- RENDERING SCREENS ---
 
     if (!inLobby) {
@@ -191,6 +243,14 @@ export default function GameBoard() {
     const question = localQuestions[currentIndex];
 
     return (
+        <>
+        <button
+            onClick={toggleMute}
+            title={isMuted ? "Unmute" : "Mute"}
+            className="fixed top-4 right-4 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 text-lg transition-colors"
+        >
+            {isMuted ? "🔇" : "🔊"}
+        </button>
         <div className="w-full max-w-2xl bg-white p-6 md:p-10 rounded-2xl shadow-xl">
             <div className="flex justify-between items-center mb-6">
                 <div className="flex flex-col gap-1">
@@ -246,5 +306,6 @@ export default function GameBoard() {
                 </div>
             )}
         </div>
+        </>
     );
 }
