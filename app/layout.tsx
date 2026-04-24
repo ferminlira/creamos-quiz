@@ -15,6 +15,18 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
+  openGraph: {
+    title: 'Creamos Quiz Game',
+    description: 'A multiplayer trivia game about our creative agency.',
+    images: [{ url: '/images/creamos_open-graph-image.png' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Creamos Quiz Game',
+    description: 'A multiplayer trivia game about our creative agency.',
+    images: ['/images/creamos_open-graph-image.png'],
+  },
 }
 
 export default function RootLayout({
