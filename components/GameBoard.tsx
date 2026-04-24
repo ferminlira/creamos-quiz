@@ -55,6 +55,7 @@ export default function GameBoard() {
     const [leaderboard, setLeaderboard] = useState<{ name: string; score: number }[]>([]);
 
     const [players, setPlayers] = useState<{ name: string; color: string }[]>([]);
+    const [countdown, setCountdown] = useState<number | null>(null);
 
     const channelRef = useRef<any>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -152,16 +153,16 @@ export default function GameBoard() {
             .on("broadcast", { event: "start_game" }, () => {
                 const shuffled = [...quizQuestions].sort(() => Math.random() - 0.5);
                 setLocalQuestions(shuffled);
-                setGameState("playing");
                 setCurrentIndex(0);
                 setScore(0);
-                setTimeLeft(15);
                 setShowResult(false);
                 setSelectedAnswer(null);
+                setCountdown(3);
             })
             .on("broadcast", { event: "back_to_lobby" }, () => {
                 setGameState("lobby");
                 setPlayers([]);
+                setCountdown(null);
                 setCurrentIndex(0);
                 setTimeLeft(15);
                 setShowResult(false);
@@ -179,6 +180,21 @@ export default function GameBoard() {
             supabase.removeChannel(channel);
         };
     }, []);
+
+    // Countdown before first question
+    useEffect(() => {
+        if (countdown === null) return;
+        const t = setTimeout(() => {
+            if (countdown === 1) {
+                setGameState("playing");
+                setTimeLeft(15);
+                setCountdown(null);
+            } else {
+                setCountdown(countdown - 1);
+            }
+        }, 1000);
+        return () => clearTimeout(t);
+    }, [countdown]);
 
     // Timer logic for each round
     useEffect(() => {
@@ -276,6 +292,41 @@ export default function GameBoard() {
                         Enter the Lobby
                     </button>
                 </div>
+
+                <img
+                    src="/images/Creamos_PrimaryWordmark_WithTagline.svg"
+                    alt="Creamos"
+                    className="w-28 mt-6 mx-auto block"
+                    style={{ opacity: 0.35 }}
+                />
+            </div>
+        );
+    }
+
+    // COUNTDOWN SCREEN
+    if (countdown !== null) {
+        return (
+            <div className="flex items-center justify-center" style={{ minHeight: "60vh" }}>
+                <style>{`
+                    @keyframes countdownPop {
+                        0%   { opacity: 0; transform: scale(0.4); }
+                        25%  { opacity: 1; transform: scale(1.08); }
+                        65%  { opacity: 1; transform: scale(1); }
+                        100% { opacity: 0; transform: scale(1.5); }
+                    }
+                `}</style>
+                <span
+                    key={countdown}
+                    className="font-black select-none tabular-nums"
+                    style={{
+                        fontSize: "clamp(8rem, 30vw, 16rem)",
+                        lineHeight: 1,
+                        color: "#fdb648",
+                        animation: "countdownPop 1s ease-out forwards",
+                    }}
+                >
+                    {countdown}
+                </span>
             </div>
         );
     }
@@ -308,7 +359,7 @@ export default function GameBoard() {
                         Waiting Room
                     </p>
                     <p className="text-xs mb-6 text-center" style={{ color: "#888888" }}>
-                        {players.length} {players.length === 1 ? "player" : "players"} in the room
+                        {players.length} {players.length === 1 ? "player" : "players"}
                     </p>
                     <div className="flex flex-wrap gap-5 justify-center min-h-[88px]">
                         {players.length === 0 && (

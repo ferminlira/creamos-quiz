@@ -127,4 +127,28 @@ export const quizQuestions: Question[] = [
         correctAnswerIndex: 1,
         fact: "CHOC Factory managed to request same-day work on a Black Friday — a Creamos legend.",
     },
+    {
+        id: 16,
+        text: "If Lili were to open a gallery featuring her Together Friday drawings, what would the critic's main takeaway be?",
+        options: [
+            "Perfect anatomical accuracy.",
+            "The obvious work of a modern Da Vinci.",
+            "Flawless use of perspective and shading.",
+            "Like Picasso, but blindfolded.",
+        ],
+        correctAnswerIndex: 3,
+        fact: "Lili's Together Friday drawings are a beloved Creamos tradition — technically unique, emotionally unforgettable.",
+    },
+    {
+        id: 17,
+        text: "When Hans invited you to a \"quick 5-minute catch-up,\" what should you realistically prepare for?",
+        options: [
+            "Uncomfortable, prolonged silences.",
+            "A multi-generational saga.",
+            "Ruthless, to-the-point efficiency.",
+            "Getting out two minutes early.",
+        ],
+        correctAnswerIndex: 1,
+        fact: "Hans's catch-ups are legendary for their depth, warmth, and generous relationship with the concept of time.",
+    },
 ];
