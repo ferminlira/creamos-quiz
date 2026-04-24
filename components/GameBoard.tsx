@@ -21,9 +21,41 @@ export default function GameBoard() {
     // Leaderboard state
     const [leaderboard, setLeaderboard] = useState<{ name: string; score: number }[]>([]);
 
+    const [players, setPlayers] = useState<{ name: string; color: string }[]>([]);
+
     const channelRef = useRef<any>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const playerNameRef = useRef("");
     const [isMuted, setIsMuted] = useState(false);
+
+    const getPlayerColor = (name: string) => {
+        const palette = ["#F5E600", "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FF8C69", "#DDA0DD", "#98D8C8"];
+        const hash = name.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+        return palette[hash % palette.length];
+    };
+
+    // Announce self when joining the lobby
+    useEffect(() => {
+        if (!inLobby || !playerName.trim()) return;
+        channelRef.current?.send({
+            type: "broadcast",
+            event: "player_joined",
+            payload: { name: playerName.trim() },
+        });
+    }, [inLobby]);
+
+    // Re-announce self whenever we return to the lobby (e.g. after back_to_lobby)
+    useEffect(() => {
+        if (gameState !== "lobby" || !inLobby || !playerNameRef.current) return;
+        const t = setTimeout(() => {
+            channelRef.current?.send({
+                type: "broadcast",
+                event: "player_joined",
+                payload: { name: playerNameRef.current },
+            });
+        }, 150);
+        return () => clearTimeout(t);
+    }, [gameState]);
 
     // Audio setup — create once on mount, clean up on unmount
     useEffect(() => {
@@ -77,6 +109,20 @@ export default function GameBoard() {
         });
 
         channel
+            .on("broadcast", { event: "player_joined" }, ({ payload }) => {
+                setPlayers((prev) => {
+                    if (prev.some((p) => p.name === payload.name)) return prev;
+                    // Re-announce self so the new joiner discovers us
+                    if (playerNameRef.current) {
+                        channelRef.current?.send({
+                            type: "broadcast",
+                            event: "player_joined",
+                            payload: { name: playerNameRef.current },
+                        });
+                    }
+                    return [...prev, { name: payload.name, color: getPlayerColor(payload.name) }];
+                });
+            })
             .on("broadcast", { event: "start_game" }, () => {
                 // When anyone starts the game, shuffle questions and begin!
                 const shuffled = [...quizQuestions].sort(() => Math.random() - 0.5);
@@ -90,6 +136,7 @@ export default function GameBoard() {
             })
             .on("broadcast", { event: "back_to_lobby" }, () => {
                 setGameState("lobby");
+                setPlayers([]);
                 setCurrentIndex(0);
                 setTimeLeft(15);
                 setShowResult(false);
@@ -181,7 +228,7 @@ export default function GameBoard() {
                     type="text"
                     placeholder="Enter your name"
                     value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value)}
+                    onChange={(e) => { setPlayerName(e.target.value); playerNameRef.current = e.target.value; }}
                     className="p-3 border rounded-lg focus:ring-creamos-primary focus:outline-none w-64"
                 />
                 <button
@@ -196,16 +243,61 @@ export default function GameBoard() {
     }
 
     if (gameState === "lobby") {
+        const canStart = players.length >= 2;
         return (
-            <div className="text-center">
-                <h2 className="text-3xl font-bold mb-4">Waiting for players...</h2>
-                <p className="mb-8">When everyone is here, click start!</p>
+            <div className="text-center w-full max-w-lg">
+                <style>{`
+                    @keyframes fadeInScale {
+                        from { opacity: 0; transform: scale(0.75); }
+                        to   { opacity: 1; transform: scale(1); }
+                    }
+                `}</style>
+
+                {/* Player presence panel */}
+                <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-4">
+                    {players.length} {players.length === 1 ? "player" : "players"} in the room
+                </p>
+                <div className="flex flex-wrap gap-4 justify-center min-h-[88px] mb-10">
+                    {players.length === 0 && (
+                        <p className="text-gray-600 text-sm self-center">No one here yet…</p>
+                    )}
+                    {players.map((player) => (
+                        <div
+                            key={player.name}
+                            className="flex flex-col items-center gap-1.5"
+                            style={{ animation: "fadeInScale 0.3s ease-out" }}
+                        >
+                            <div className="relative">
+                                <div
+                                    className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-extrabold text-[#080808] select-none"
+                                    style={{ backgroundColor: player.color }}
+                                >
+                                    {player.name.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="absolute bottom-0.5 right-0.5 w-3 h-3 bg-green-400 border-2 border-[#080808] rounded-full" />
+                            </div>
+                            <span className="text-xs text-gray-300 font-medium max-w-[64px] truncate">
+                                {player.name}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                <h2 className="text-3xl font-bold mb-2">Waiting for players...</h2>
+                <p className="mb-8 text-gray-400 text-sm">When everyone is here, click start!</p>
+
                 <button
                     onClick={startGameBroadcast}
-                    className="bg-creamos-accent text-creamos-secondary px-8 py-3 rounded-lg font-extrabold text-xl shadow-lg hover:scale-105 transition-transform"
+                    disabled={!canStart}
+                    className={`px-8 py-3 rounded-lg font-extrabold text-xl shadow-lg transition-all duration-200 ${
+                        canStart
+                            ? "bg-creamos-accent text-creamos-secondary hover:scale-105 cursor-pointer"
+                            : "bg-gray-800 text-gray-600 cursor-not-allowed"
+                    }`}
                 >
-                    START GAME FOR EVERYONE
+                    {canStart ? "START GAME FOR EVERYONE" : "Waiting for more players..."}
                 </button>
+
                 <div className="mt-6">
                     <button
                         onClick={backToLobbyBroadcast}
@@ -253,15 +345,7 @@ export default function GameBoard() {
         </button>
         <div className="w-full max-w-2xl bg-white p-6 md:p-10 rounded-2xl shadow-xl">
             <div className="flex justify-between items-center mb-6">
-                <div className="flex flex-col gap-1">
-                    <span className="font-bold text-gray-500">Question {currentIndex + 1} / {localQuestions.length}</span>
-                    <button
-                        onClick={backToLobbyBroadcast}
-                        className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors text-left"
-                    >
-                        ↩ Back to Lobby
-                    </button>
-                </div>
+                <span className="font-bold text-gray-500">Question {currentIndex + 1} / {localQuestions.length}</span>
                 <span className={`font-extrabold text-2xl ${timeLeft <= 5 ? "text-red-500 animate-pulse" : "text-creamos-secondary"}`}>
                     00:{timeLeft.toString().padStart(2, "0")}
                 </span>
@@ -306,6 +390,12 @@ export default function GameBoard() {
                 </div>
             )}
         </div>
+        <button
+            onClick={backToLobbyBroadcast}
+            className="mt-4 text-xs text-gray-500 hover:text-gray-300 underline underline-offset-2 transition-colors"
+        >
+            ↩ Back to Lobby
+        </button>
         </>
     );
 }
