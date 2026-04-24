@@ -43,6 +43,14 @@ export default function GameBoard() {
                 setShowResult(false);
                 setSelectedAnswer(null);
             })
+            .on("broadcast", { event: "back_to_lobby" }, () => {
+                setGameState("lobby");
+                setCurrentIndex(0);
+                setTimeLeft(15);
+                setShowResult(false);
+                setSelectedAnswer(null);
+                setLocalQuestions([]);
+            })
             .on("broadcast", { event: "player_finished" }, ({ payload }) => {
                 // When a player finishes, add them to the leaderboard
                 setLeaderboard((prev) => [...prev, payload].sort((a, b) => b.score - a.score));
@@ -104,6 +112,13 @@ export default function GameBoard() {
         });
     };
 
+    const backToLobbyBroadcast = () => {
+        channelRef.current?.send({
+            type: "broadcast",
+            event: "back_to_lobby",
+        });
+    };
+
     // --- RENDERING SCREENS ---
 
     if (!inLobby) {
@@ -139,6 +154,14 @@ export default function GameBoard() {
                 >
                     START GAME FOR EVERYONE
                 </button>
+                <div className="mt-6">
+                    <button
+                        onClick={backToLobbyBroadcast}
+                        className="text-xs text-gray-500 hover:text-gray-300 underline underline-offset-2 transition-colors"
+                    >
+                        ↩ Back to Lobby
+                    </button>
+                </div>
             </div>
         );
     }
@@ -170,7 +193,15 @@ export default function GameBoard() {
     return (
         <div className="w-full max-w-2xl bg-white p-6 md:p-10 rounded-2xl shadow-xl">
             <div className="flex justify-between items-center mb-6">
-                <span className="font-bold text-gray-500">Question {currentIndex + 1} / {localQuestions.length}</span>
+                <div className="flex flex-col gap-1">
+                    <span className="font-bold text-gray-500">Question {currentIndex + 1} / {localQuestions.length}</span>
+                    <button
+                        onClick={backToLobbyBroadcast}
+                        className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors text-left"
+                    >
+                        ↩ Back to Lobby
+                    </button>
+                </div>
                 <span className={`font-extrabold text-2xl ${timeLeft <= 5 ? "text-red-500 animate-pulse" : "text-creamos-secondary"}`}>
                     00:{timeLeft.toString().padStart(2, "0")}
                 </span>
