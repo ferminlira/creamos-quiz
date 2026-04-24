@@ -100,13 +100,6 @@ export const quizQuestions: Question[] = [
         fact: "Some clients leave a stronger impression than others…",
     },
     {
-        id: 12,
-        text: "When did Lili join Creamos?",
-        options: ["June 2023", "June 2024", "January 2025", "January 2023"],
-        correctAnswerIndex: 1,
-        fact: "Lili joined the Creamos team in June 2024.",
-    },
-    {
         id: 13,
         text: "Who fainted on his first day working at Creamos?",
         options: ["Fermin", "Martin Vainstein", "Sol", "Ignacio"],

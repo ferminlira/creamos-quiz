@@ -104,7 +104,7 @@ export default function GameBoard() {
 
         if (gameState === "playing") {
             audio.currentTime = 0;
-            audio.volume = 1;
+            audio.volume = 0.8;
             audio.play().catch(() => {});
         } else if (gameState === "finished") {
             const steps = 30;
