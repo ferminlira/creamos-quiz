@@ -1,5 +1,5 @@
 // app/page.tsx
-"use client"; // This tells Next.js this is an interactive client-side component
+"use client";
 
 import { useState } from "react";
 import GameBoard from "../components/GameBoard";
@@ -19,45 +19,60 @@ export default function Home() {
     }
   };
 
-  // If they are logged in, show the actual game (we will build GameBoard next)
-  // If they are logged in, show the actual game
   if (isLoggedIn) {
     return (
       <main className="min-h-screen p-8 flex flex-col items-center justify-center">
-        <GameBoard /> {/* <-- Uncomment this line */}
+        <GameBoard />
       </main>
     );
   }
 
-  // Otherwise, show the Login Screen
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full border-t-4 border-creamos-primary">
-        <h1 className="text-3xl font-extrabold text-center mb-6 text-creamos-secondary">
-          Creamos Quiz
-        </h1>
+    <main className="min-h-screen flex flex-col items-center justify-center p-6">
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-[#333333]">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-creamos-primary text-[#333333]"
-              placeholder="Enter password"
-            />
-          </div>
+      <div
+        className="flex flex-col items-center gap-8 w-full max-w-xs text-center"
+        style={{ animation: "fadeInUp 0.7s ease-out" }}
+      >
+        <h1 className="text-6xl font-black text-white tracking-tight">Quiz time!</h1>
 
-          {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
-
+        <form onSubmit={handleLogin} className="flex flex-col gap-3 w-full">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3.5 rounded-xl text-white border focus:outline-none transition-colors text-center font-semibold text-lg"
+            style={{ backgroundColor: "#424242", borderColor: "#555555", caretColor: "#fdb648" }}
+            onFocus={(e) => (e.target.style.borderColor = "#fdb648")}
+            onBlur={(e) => (e.target.style.borderColor = "#555555")}
+            placeholder="Enter password"
+          />
+          {error && (
+            <p className="text-sm font-medium" style={{ color: "#fc2560" }}>
+              {error}
+            </p>
+          )}
           <button
             type="submit"
-            className="mt-4 w-full bg-creamos-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors"
+            className="w-full py-3.5 rounded-xl font-extrabold text-lg transition-all duration-200"
+            style={{ backgroundColor: "#fdb648", color: "#333333" }}
           >
-            Enter Game
+            Enter
           </button>
         </form>
+
+        <img
+          src="/images/Creamos_PrimaryWordmark_WithTagline.svg"
+          alt="Creamos"
+          className="w-32 mt-2"
+          style={{ opacity: 0.45 }}
+        />
       </div>
     </main>
   );

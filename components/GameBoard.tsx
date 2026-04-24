@@ -292,10 +292,7 @@ export default function GameBoard() {
                     }
                 `}</style>
 
-                <h1 className="text-5xl font-black tracking-tight text-white mb-1">CREAMOS</h1>
-                <p className="text-xs tracking-[0.3em] uppercase mb-10" style={{ color: "#888888" }}>
-                    Quiz Night · Waiting Room
-                </p>
+                <h1 className="text-5xl md:text-6xl font-black text-white mb-10">Quiz time!</h1>
 
                 {/* Player presence panel */}
                 <div className="rounded-2xl p-6 mb-8" style={{ backgroundColor: "#3d3d3d" }}>
@@ -350,17 +347,22 @@ export default function GameBoard() {
                     {canStart ? "START GAME FOR EVERYONE" : "Waiting for more players..."}
                 </button>
 
-                <div className="mt-6">
-                    <button
-                        onClick={backToLobbyBroadcast}
-                        className="text-xs underline underline-offset-2 transition-colors"
-                        style={{ color: "#888888" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = "#888888")}
-                    >
-                        ↩ Back to Lobby
-                    </button>
-                </div>
+                <button
+                    onClick={backToLobbyBroadcast}
+                    className="mt-5 px-5 py-2 rounded-full border text-xs font-medium transition-all duration-200"
+                    style={{ borderColor: "#555555", color: "#888888" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "#cccccc"; e.currentTarget.style.borderColor = "#888888"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "#888888"; e.currentTarget.style.borderColor = "#555555"; }}
+                >
+                    ↩ Back to Lobby
+                </button>
+
+                <img
+                    src="/images/Creamos_PrimaryWordmark_WithTagline.svg"
+                    alt="Creamos"
+                    className="w-28 mt-10"
+                    style={{ opacity: 0.35 }}
+                />
             </div>
         );
     }
@@ -424,10 +426,18 @@ export default function GameBoard() {
         <button
             onClick={toggleMute}
             title={isMuted ? "Unmute" : "Mute"}
-            className="fixed top-4 right-4 z-50 w-9 h-9 flex items-center justify-center rounded-full text-lg transition-colors"
-            style={{ backgroundColor: "#424242" }}
+            className="fixed top-4 right-4 z-50 w-9 h-9 flex items-center justify-center rounded-full transition-colors"
+            style={{ backgroundColor: "#424242", color: isMuted ? "#555555" : "#fdb648" }}
         >
-            {isMuted ? "🔇" : "🔊"}
+            {isMuted ? (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.68-7.94-6.47-9.38v2.12A8 8 0 0119 12zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a9.955 9.955 0 003.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                </svg>
+            ) : (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+            )}
         </button>
 
         <div className="w-full max-w-2xl rounded-2xl overflow-hidden" style={{ backgroundColor: "#3d3d3d" }}>
@@ -504,10 +514,10 @@ export default function GameBoard() {
 
         <button
             onClick={backToLobbyBroadcast}
-            className="mt-4 text-xs underline underline-offset-2 transition-colors"
-            style={{ color: "#888888" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#888888")}
+            className="mt-4 px-5 py-2 rounded-full border text-xs font-medium transition-all duration-200"
+            style={{ borderColor: "#555555", color: "#888888" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#cccccc"; e.currentTarget.style.borderColor = "#888888"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#888888"; e.currentTarget.style.borderColor = "#555555"; }}
         >
             ↩ Back to Lobby
         </button>
