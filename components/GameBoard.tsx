@@ -240,7 +240,16 @@ export default function GameBoard() {
     // JOIN SCREEN
     if (!inLobby) {
         return (
-            <div className="flex flex-col items-center gap-8 py-16 px-6 text-center">
+            <div
+                className="flex flex-col items-center gap-8 py-16 px-6 text-center"
+                style={{ animation: "fadeInUp 0.7s ease-out" }}
+            >
+            <style>{`
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
                 <img
                     src="/images/Creamos_PrimaryWordmark_WithTagline.svg"
                     alt="Creamos"
