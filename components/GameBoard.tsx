@@ -241,12 +241,11 @@ export default function GameBoard() {
     if (!inLobby) {
         return (
             <div className="flex flex-col items-center gap-8 py-16 px-6 text-center">
-                <div>
-                    <h1 className="text-7xl font-black tracking-tight text-white">CREAMOS</h1>
-                    <p className="text-sm mt-2 tracking-[0.3em] uppercase" style={{ color: "#888888" }}>
-                        Quiz Night
-                    </p>
-                </div>
+                <img
+                    src="/images/Creamos_PrimaryWordmark_WithTagline.svg"
+                    alt="Creamos"
+                    className="w-64"
+                />
 
                 <div className="w-full max-w-xs flex flex-col gap-3 mt-4">
                     <input
