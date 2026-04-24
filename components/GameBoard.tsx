@@ -290,13 +290,24 @@ export default function GameBoard() {
                         from { opacity: 0; transform: scale(0.75); }
                         to   { opacity: 1; transform: scale(1); }
                     }
+                    @keyframes spinBorder {
+                        from { transform: translate(-50%, -50%) rotate(0deg); }
+                        to   { transform: translate(-50%, -50%) rotate(360deg); }
+                    }
+                    @keyframes pulseGlow {
+                        0%, 100% { opacity: 0.35; }
+                        50%      { opacity: 0.65; }
+                    }
                 `}</style>
 
                 <h1 className="text-5xl md:text-6xl font-black text-white mb-10">Quiz time!</h1>
 
                 {/* Player presence panel */}
                 <div className="rounded-2xl p-6 mb-8" style={{ backgroundColor: "#3d3d3d" }}>
-                    <p className="text-xs uppercase tracking-widest font-semibold mb-6" style={{ color: "#888888" }}>
+                    <p className="text-xs uppercase tracking-widest font-semibold mb-1 text-center" style={{ color: "#888888" }}>
+                        Waiting Room
+                    </p>
+                    <p className="text-xs mb-6 text-center" style={{ color: "#888888" }}>
                         {players.length} {players.length === 1 ? "player" : "players"} in the room
                     </p>
                     <div className="flex flex-wrap gap-5 justify-center min-h-[88px]">
@@ -334,18 +345,50 @@ export default function GameBoard() {
                     </div>
                 </div>
 
-                <button
-                    onClick={startGameBroadcast}
-                    disabled={!canStart}
-                    className="w-full py-4 rounded-xl font-extrabold text-xl transition-all duration-200 disabled:cursor-not-allowed"
-                    style={
-                        canStart
-                            ? { backgroundColor: "#fdb648", color: "#333333" }
-                            : { backgroundColor: "#424242", color: "#888888" }
-                    }
-                >
-                    {canStart ? "START GAME FOR EVERYONE" : "Waiting for more players..."}
-                </button>
+                <div className="relative w-full">
+                    {canStart && (
+                        <>
+                            {/* Spinning conic border strip — clipped to a 3px ring */}
+                            <div className="absolute -inset-[3px] rounded-[15px] overflow-hidden" style={{ zIndex: 0 }}>
+                                <div style={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    left: "50%",
+                                    width: "200%",
+                                    aspectRatio: "1",
+                                    background: "conic-gradient(from 0deg, #fdb648, #fc2560, #4d5dfb, #25e4a2, #fdb648)",
+                                    animation: "spinBorder 2s linear infinite",
+                                }} />
+                            </div>
+                            {/* Blurred outer glow halo */}
+                            <div style={{
+                                position: "absolute",
+                                inset: "-10px",
+                                borderRadius: "20px",
+                                background: "conic-gradient(from 0deg, #fdb648, #fc2560, #4d5dfb, #25e4a2, #fdb648)",
+                                filter: "blur(16px)",
+                                animation: "spinBorder 2s linear infinite, pulseGlow 1.5s ease-in-out infinite",
+                                zIndex: 0,
+                                top: "50%",
+                                left: "50%",
+                                width: "200%",
+                                aspectRatio: "1",
+                                transformOrigin: "center",
+                            }} />
+                        </>
+                    )}
+                    <button
+                        onClick={startGameBroadcast}
+                        disabled={!canStart}
+                        className="relative w-full py-4 rounded-xl font-extrabold text-xl transition-all duration-200 disabled:cursor-not-allowed"
+                        style={{
+                            ...(canStart ? { backgroundColor: "#fdb648", color: "#333333" } : { backgroundColor: "#424242", color: "#888888" }),
+                            zIndex: 1,
+                        }}
+                    >
+                        {canStart ? "START GAME FOR EVERYONE" : "Waiting for more players..."}
+                    </button>
+                </div>
 
                 <button
                     onClick={backToLobbyBroadcast}
@@ -360,7 +403,7 @@ export default function GameBoard() {
                 <img
                     src="/images/Creamos_PrimaryWordmark_WithTagline.svg"
                     alt="Creamos"
-                    className="w-28 mt-10"
+                    className="w-28 mt-10 mx-auto block"
                     style={{ opacity: 0.35 }}
                 />
             </div>
