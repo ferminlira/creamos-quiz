@@ -6,18 +6,16 @@ import GameBoard from "../components/GameBoard";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Check against your requested credentials
-    if (username === "admin" && password === "Creamos.123456") {
+    if (password === "Creamos.123456") {
       setIsLoggedIn(true);
       setError("");
     } else {
-      setError("Incorrect username or password. Please try again.");
+      setError("Incorrect password. Please try again.");
     }
   };
 
@@ -41,23 +39,12 @@ export default function Home() {
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-semibold mb-1">Username</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-creamos-primary"
-              placeholder="Enter username"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Password</label>
+            <label className="block text-sm font-semibold mb-1 text-[#333333]">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-creamos-primary"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-creamos-primary text-[#333333]"
               placeholder="Enter password"
             />
           </div>
